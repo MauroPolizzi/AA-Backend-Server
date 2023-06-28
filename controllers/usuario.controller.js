@@ -6,19 +6,35 @@ const { generateJWT } = require('../helpers/token');
 
 const getUsuarios = async (req, res) => {
 
-    const ususarioCollection = await UsusarioModel.find( {}, 'Guid nombre email role google');
+    // Obtenemos el valor del query params que vendra como 'pagina', y transformamos su valor en numero
+    const pagina = Number(req.query.pagina) || 0;
+
+    // Usamos una Promise.all que ejecuta en simultaneo varias promesas
+    // y devuelve un array de resultados, segun el orden que las ejecuta
+    // en este caso el 'ususarioCollection' tendra el valor de la priemra
+    // y 'total' de la segunda
+    // usamos desestructuracion para sacar los resultados que queremos, para
+    // luego mostrarlos en la respuesta
+    const [usuarioCollection, total] = await Promise.all([
+
+        UsusarioModel.find( {}, 'Guid nombre email img role google')
+            .skip(pagina)
+            .limit(5),
+
+        UsusarioModel.count()
+    ]);
 
     res.json({
         ok: true,
-        ususarioCollection,
-        GetBy: req.guid
+        usuarioCollection,
+        total
     });
 }
 
 const postUsuario = async (req, res = response) => {
     
     // Desestructuramos la requiure que viene del front
-    const { email, password, nombre } = req.body;
+    const { email, password } = req.body;
 
     try {
         
@@ -35,26 +51,29 @@ const postUsuario = async (req, res = response) => {
 
         // Si llegamos aqui, podemos crear el usuario
         // Realizamos una instancia de UsuarioModel
-        const ususarioDestino = new UsusarioModel( req.body );
+        const usuarioDestino = new UsusarioModel( req.body );
 
         // Generamos un salt para encriptar
         const salt = bcrypt.genSaltSync();
         // Realizamos el hash de la password, y mandamos el salt
-        ususarioDestino.password = bcrypt.hashSync(password, salt);
+        usuarioDestino.password = bcrypt.hashSync(password, salt);
 
         // Generamos un token con el _id generado por mongoose
-        const token = await generateJWT(ususarioDestino._id);
+        const token = await generateJWT(usuarioDestino._id);
 
         // Grabamos en BBDD
-        await ususarioDestino.save();
+        await usuarioDestino.save();
+
+        // Buscamos el usuario quien lo creo
+        const createdByUser = await UsusarioModel.findById(req.guid);
 
         // Devolvemos la respuesta
         res.json({
             ok: true,
             message: 'Ususario creado',
-            ususarioDestino,
+            usuarioDestino,
             token,
-            createdBy: req.guid
+            createdByUser
         });
 
     } catch (error) {
@@ -103,13 +122,13 @@ const putUsuario = async (req, res = response) => {
         campos.email = email;
 
         // Buscamos y actualizamos (persiste en BBDD)
-        const ususarioDestino = await UsusarioModel.findByIdAndUpdate(_guid, campos, { new: true });
+        const usuarioDestino = await UsusarioModel.findByIdAndUpdate(_guid, campos, { new: true });
 
         // Devolvemos la respuesta
         res.status(200).json({
             ok: true,
             message: 'Usuario actualizado!',
-            ususarioDestino,
+            usuarioDestino,
             modifiedBy: req.guid
         });
 
@@ -157,7 +176,7 @@ const deleteUsuario = async (req, res = response) => {
 
         res.status(500).json({
             ok: false,
-            message: 'Error al intentar eliminar el ususario'
+            message: 'Error al intentar eliminar el usuario'
         });
     }
 } 

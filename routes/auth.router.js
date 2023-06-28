@@ -3,10 +3,10 @@ const { check } = require("express-validator");
 const { login } = require("../controllers/auth.controller");
 const { validarCampos } = require("../middlewares/validator-campos");
 
-const routerAuth = Router();
+const authRouter = Router();
 
 // Ruta de login
-routerAuth.post(
+authRouter.post(
     '/', 
     [
         check('email', 'El email es requerido').isEmail(),
@@ -17,5 +17,5 @@ routerAuth.post(
 );
 
 module.exports = {
-    routerAuth
+    authRouter
 }

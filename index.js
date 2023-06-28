@@ -6,8 +6,14 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { dbConnection } = require('./database/config');
-const { router } = require('./routes/ususario.route');
-const { routerAuth } = require('./routes/auth.router');
+
+// Routers
+const { usuarioRouter } = require('./routes/ususario.route');
+const { authRouter } = require('./routes/auth.router');
+const { hospitalRouter } = require('./routes/hospital.router');
+const { medicoRouter } = require('./routes/medico.router');
+const { searchRouter } = require('./routes/search.router');
+const { fileuploadRouter } = require('./routes/file-upload.router');
 
 // Creamos el servidor de express
 const app = express();
@@ -22,8 +28,12 @@ app.use( express.json() );
 dbConnection();
 
 // Creamos las rutas
-app.use('/api/ususario', router); 
-app.use('/api/login', routerAuth);
+app.use('/api/usuario', usuarioRouter); 
+app.use('/api/login', authRouter);
+app.use('/api/hospital', hospitalRouter);
+app.use('/api/medico', medicoRouter);
+app.use('/api/todo', searchRouter);
+app.use('/api/fileupload', fileuploadRouter);
 
 //Iniciamos el servidor y determinamos el puerto
 app.listen( process.env.PORT, () => {

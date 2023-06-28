@@ -1,17 +1,17 @@
 const { Router } = require('express');
 const { check } = require('express-validator')
 
-const { getUsuarios, postUsuario, putUsuario, deleteUsuario } = require('../controllers/ususario.controller');
+const { getUsuarios, postUsuario, putUsuario, deleteUsuario } = require('../controllers/usuario.controller');
 const { validarCampos } = require('../middlewares/validator-campos');
 const { validarJWT } = require('../middlewares/validator-token');
 
-const router = Router();
+const usuarioRouter = Router();
 
 // Get
-router.get( '/', [validarJWT], getUsuarios);
+usuarioRouter.get( '/', [validarJWT], getUsuarios);
 
 // Post
-router.post(
+usuarioRouter.post(
     '/',
     [
         // Para crear ususario se neceitara el token
@@ -26,7 +26,7 @@ router.post(
 );
 
 // Put
-router.put(
+usuarioRouter.put(
     '/:guid',
     [
         validarJWT,
@@ -37,8 +37,8 @@ router.put(
     putUsuario);
 
 // Delete
-router.delete('/:guid', [validarJWT] , deleteUsuario);
+usuarioRouter.delete('/:guid', [validarJWT] , deleteUsuario);
 
 module.exports = {
-    router
+    usuarioRouter
 }
