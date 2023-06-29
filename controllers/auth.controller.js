@@ -1,4 +1,4 @@
-const { response } = require("express");
+const { response, request } = require("express");
 const bcrypt = require('bcryptjs');
 const UsusarioModel = require('../models/ususario.model');
 const { generateJWT } = require("../helpers/token");
@@ -108,7 +108,35 @@ const googleSingIn = async (req, res = response) => {
 
 }
 
+const renewToken = async (req = request, res = response) => {
+    
+    try {
+    
+        // Obtenemos el guid o id del ususario que viene de la request
+        const _guid = req.guid;
+
+        // generamos un nuevo token,
+        // es una especie de servicio para refrescar el token
+        const token = await generateJWT(_guid);
+
+        res.status(200).json({
+            ok: true,
+            message: 'Token renovado',
+            newToken: token
+        });
+
+    } catch (error) {
+        
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Error al intentar renovar el token'
+        });
+    }
+}
+
 module.exports = {
     login,
-    googleSingIn
+    googleSingIn,
+    renewToken
 }
