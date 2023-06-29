@@ -21,6 +21,10 @@ const app = express();
 // Configuramos CORS
 app.use( cors() );
 
+// Aqui hacemos que se despliegue al cliente lo que este en la carpeta 'public'
+// Es una especie de frontend que tenemos
+app.use( express.static('public') );
+
 // Realizamos la lectura de lo que viene desde el frontend
 app.use( express.json() );
 

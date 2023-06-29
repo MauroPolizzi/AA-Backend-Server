@@ -2,6 +2,7 @@ const { response } = require("express");
 const bcrypt = require('bcryptjs');
 const UsusarioModel = require('../models/ususario.model');
 const { generateJWT } = require("../helpers/token");
+const { googleVerifyTOKEN } = require("../helpers/google-verify");
 
 const login = async (req, res = response) => {
 
@@ -56,6 +57,58 @@ const login = async (req, res = response) => {
     }
 }
 
+const googleSingIn = async (req, res = response) => {
+
+    try {
+        
+        // Mandamos el token que nos genera el boton de google
+        const userAuth = await googleVerifyTOKEN(req.body.token);
+        const { name, email, picture } = userAuth;
+
+        const usuarioDB = await UsusarioModel.findOne({email});
+        let usuarioDestino;
+
+        // Generamos un nuevo usuario si no existe
+        if (!usuarioDB) {
+            usuarioDestino = new UsusarioModel({
+                nombre: name,
+                email,
+                password: '@@@', // Esto es solo para que no choque con la validacion de passwprd
+                img: picture,
+                google: true
+            });
+        
+        // Si existe el user, lo igualamos al que ya tenemos en BBDD
+        }else{
+            usuarioDestino = usuarioDB;
+            usuarioDestino.google = true;
+        }
+
+        // Guardamos el user en BBDD
+        await usuarioDestino.save();
+
+        // Generamos su token del backend
+        const token = await generateJWT(usuarioDestino._id);
+
+        // Devolvemos la respons
+        res.status(200).json({
+            ok: true,
+            userAuth,
+            tokenServer: token
+        })
+
+    } catch (error) {
+        
+        console.log(error);
+        res.status(400).json({
+            ok: false,
+            message: 'El token de Google incorrecto'
+        })
+    }
+
+}
+
 module.exports = {
-    login
+    login,
+    googleSingIn
 }

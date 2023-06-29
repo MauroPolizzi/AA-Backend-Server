@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sing in</title>
+</head>
+<body>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <h1>Google Sing in</h1>
+    <div id="buttonDiv"></div> 
+
+    <script>
+
+        var url = 'http://localhost:3000/api/login/google'
+
+        function handleCredentialResponse(response) {
+          console.log("Encoded JWT ID token: " + response.credential);
+
+          // Aqui hacemos el llamado al endPoint de nuestro server
+          // y le pasamos en el body el token que espera
+          fetch( url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: response.credential })
+          } )
+          .then( resp => resp.json() )
+          .then( data => console.log('Nuestro Server: ', data) )
+          .catch( console.log );
+        }
+
+        // Implementamos el boton con el GOOGLE_ID (variable de entorno .env) en plano
+        // Mirar la documentacion 
+        // https://developers.google.com/identity/gsi/web/guides/display-button?hl=es-419
+        window.onload = function () {
+          google.accounts.id.initialize({
+            client_id: "459567625014-odk90d389jnsurk8s89p1ls833srcc29.apps.googleusercontent.com",
+            callback: handleCredentialResponse
+          });
+          google.accounts.id.renderButton(
+            document.getElementById("buttonDiv"),
+            { theme: "outline", size: "large" }  // customization attributes
+          );
+          google.accounts.id.prompt(); // also display the One Tap dialog
+        }
+    </script>
+
+</body>
+</html>
