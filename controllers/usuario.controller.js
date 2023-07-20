@@ -118,8 +118,16 @@ const putUsuario = async (req, res = response) => {
             }
         }
 
-        // Mandamos el email
-        campos.email = email;
+        // Mandamos el email solo si no es un usuario autenticado a traves de google
+        if(!usuarioDB.google){
+            campos.email = email;
+        
+        }else if(usuarioDB.email !== email){
+            return res.status(400).json({
+                ok: false,
+                message: 'Usuarios autenticados a traves de Google no pueden actualizar su email'
+            });
+        }
 
         // Buscamos y actualizamos (persiste en BBDD)
         const usuarioDestino = await UsusarioModel.findByIdAndUpdate(_guid, campos, { new: true });

@@ -15,7 +15,7 @@ usuarioRouter.post(
     '/',
     [
         // Para crear ususario se neceitara el token
-        validarJWT,
+        //validarJWT,
         // Usuamos el check de la libreria de 'express-validator'
         check('nombre', 'El nombre es requerido').not().isEmpty(),
         check('password', 'El password es requerido').not().isEmpty(),

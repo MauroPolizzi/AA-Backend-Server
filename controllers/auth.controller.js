@@ -102,7 +102,7 @@ const googleSingIn = async (req, res = response) => {
         console.log(error);
         res.status(400).json({
             ok: false,
-            message: 'El token de Google incorrecto'
+            message: 'El token de Google es incorrecto'
         })
     }
 
@@ -119,10 +119,14 @@ const renewToken = async (req = request, res = response) => {
         // es una especie de servicio para refrescar el token
         const token = await generateJWT(_guid);
 
+        // Obtenemos el usuario al cual renovamos su token
+        const usuario = await UsusarioModel.findById(_guid);
+
         res.status(200).json({
             ok: true,
             message: 'Token renovado',
-            newToken: token
+            newToken: token,
+            usuario
         });
 
     } catch (error) {
