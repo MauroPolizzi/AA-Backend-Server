@@ -7,11 +7,11 @@ const getMedico = async (req, res = response) => {
 
     const [medicoCollection, total] = await Promise.all([
 
-        MedicoModel.find( {}, 'Guid nombre especialidad' )
+        MedicoModel.find( {}, 'Guid nombre especialidad img' )
             .populate('usuarioId', 'nombre')
             .populate('hospitalId', 'nombre')
             .skip(pagina)
-            .limit(5),
+            .limit(10),
 
         MedicoModel.count()
     ]);

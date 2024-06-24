@@ -13,7 +13,7 @@ const getHospital = async (req, res = response) => {
         HospitalModel.find()
         .populate('ususarioCreador', 'nombre')
         .skip(pagina)
-        .limit(5),
+        .limit(10),
 
         HospitalModel.count()
     ]);

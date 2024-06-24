@@ -38,7 +38,7 @@ const fileUpload = async (req, res = response) => {
     if (!extencionesValidas.includes(extencionFile)) {
         return res.status(400).json({
             ok: false,
-            message: 'Archivo no valido'
+            message: 'Archivo no valido. Extención del archivo no soportada. Extenciones permitidas: png, jpg, jpeg, gif.'
         });
     }
 
