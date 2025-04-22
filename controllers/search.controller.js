@@ -38,10 +38,10 @@ const getAllByCollection = async (req, res = response) => {
     
     switch (tabla) {
         case 'hospital':
-            data = await HospitalModel.find({ nombre: regExp });
+            data = await HospitalModel.find({ nombre: regExp }).populate('ususarioCreador', 'nombre');
             break;
         case 'medico':
-            data = await MedicoModel.find({ nombre: regExp });
+            data = await MedicoModel.find({ nombre: regExp }).populate('hospitalId', 'nombre');
             break;
         case 'usuario':
             data = await UsusarioModel.find({ nombre: regExp });
