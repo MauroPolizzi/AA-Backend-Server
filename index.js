@@ -9,11 +9,11 @@ const { dbConnection } = require('./database/config');
 
 // Routers
 const { usuarioRouter } = require('./routes/ususario.route');
-const { authRouter } = require('./routes/auth.router');
-const { hospitalRouter } = require('./routes/hospital.router');
-const { medicoRouter } = require('./routes/medico.router');
-const { searchRouter } = require('./routes/search.router');
-const { fileuploadRouter } = require('./routes/file-upload.router');
+const { authRouter } = require('./routes/auth.route');
+const { hospitalRouter } = require('./routes/hospital.route');
+const { medicoRouter } = require('./routes/medico.route');
+const { searchRouter } = require('./routes/search.route');
+const { fileuploadRouter } = require('./routes/file-upload.route');
 
 // Creamos el servidor de express
 const app = express();
