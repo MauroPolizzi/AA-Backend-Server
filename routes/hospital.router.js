@@ -2,12 +2,15 @@ const { Router } = require("express");
 const { check } = require("express-validator");
 const { validarJWT } = require("../middlewares/validator-token");
 const { validarCampos } = require("../middlewares/validator-campos");
-const { getHospital, postHospital, putHospital, deleteHospital } = require("../controllers/hospital.controller");
+const { getHospitales, postHospital, putHospital, deleteHospital, getHospitalById } = require("../controllers/hospital.controller");
 
 const hospitalRouter = Router();
 
 // Get
-hospitalRouter.get('/', [validarJWT], getHospital);
+hospitalRouter.get('/', [validarJWT], getHospitales);
+
+// Get by Id
+hospitalRouter.get('/:guid', [validarJWT], getHospitalById);
 
 // Post
 hospitalRouter.post(

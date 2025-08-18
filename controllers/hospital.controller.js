@@ -1,8 +1,8 @@
-const { response } = require("express");
+const { response, request } = require("express");
 const HospitalModel = require("../models/hospital.model");
 const UsusarioModel = require("../models/ususario.model");
 
-const getHospital = async (req, res = response) => {
+const getHospitales = async (req, res = response) => {
 
     const pagina = Number(req.query.pagina) || 0;
 
@@ -23,6 +23,36 @@ const getHospital = async (req, res = response) => {
         hospitalCollection,
         total
     });
+}
+
+const getHospitalById = async (req = request, res = response) => {
+
+    const _guid = req.params.guid;
+
+    try {
+        
+        const hospitalDB = await HospitalModel.findById(_guid);
+
+        if(!hospitalDB) {
+            return res.status.json({
+                ok: false,
+                message: 'Hospital no encontrado'
+            });
+        }
+
+        return res.status(200).json({
+            ok: true,
+            hospital: hospitalDB
+        });
+
+    } catch (error) {
+        
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Error al intentar encontrar el hospital'
+        });
+    }
 }
 
 const postHospital = async (req, res = response) => {
@@ -141,7 +171,8 @@ const deleteHospital = async (req, res = response) => {
 }
 
 module.exports = {
-    getHospital,
+    getHospitales,
+    getHospitalById,
     postHospital,
     putHospital,
     deleteHospital

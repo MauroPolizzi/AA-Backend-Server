@@ -1,8 +1,9 @@
 const { response } = require("express");
 const MedicoModel = require("../models/medico.model");
 
-const getMedico = async (req, res = response) => {
+const getMedicos = async (req, res = response) => {
 
+    // Obtenemos la paginacion desde la solicitud
     const pagina = Number(req.query.pagina) || 0;
 
     const [medicoCollection, total] = await Promise.all([
@@ -21,6 +22,35 @@ const getMedico = async (req, res = response) => {
         medicoCollection,
         total
     });
+}
+
+const getMedicoById = async (req, res = response) => {
+    
+    const _guid = req.params.guid;
+
+    try {
+        const medicoDB = await MedicoModel.findById(_guid);
+
+        if(!medicoDB) {
+            return res.status(404).json({
+                ok: false,
+                message: 'Medico no encontrado'
+            });
+        }
+
+        res.status(200).json({
+            ok: true,
+            medico: medicoDB
+        });
+    
+    } catch (error) {
+        
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Error al intentar encontrar medico'
+        });
+    }
 }
 
 const postMedico = async (req, res = response) => {
@@ -135,7 +165,8 @@ const deleteMedico = async (req, res = response) => {
 }
 
 module.exports = {
-    getMedico,
+    getMedicos,
+    getMedicoById,
     postMedico,
     putMedico,
     deleteMedico
