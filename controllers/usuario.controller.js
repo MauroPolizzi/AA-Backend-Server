@@ -19,7 +19,7 @@ const getUsuarios = async (req, res) => {
 
         UsusarioModel.find( {}, 'Guid nombre email img role google')
             .skip(pagina)
-            .limit(5),
+            .limit(10),
 
         UsusarioModel.count()
     ]);
