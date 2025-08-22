@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const { login, googleSingIn, renewToken } = require("../controllers/auth.controller");
+const { login, googleSingIn, renewToken, returnClient_id } = require("../controllers/auth.controller");
 const { validarCampos } = require("../middlewares/validator-campos");
 const { validarJWT } = require("../middlewares/validator-token");
 
@@ -30,6 +30,9 @@ authRouter.post(
 
 // Endpoint para la renovacion de un token
 authRouter.get('/renew', validarJWT, renewToken);
+
+// Endpoint para obtener el client_id
+authRouter.get('/config', returnClient_id);
 
 module.exports = {
     authRouter

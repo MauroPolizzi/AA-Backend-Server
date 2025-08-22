@@ -139,8 +139,13 @@ const renewToken = async (req = request, res = response) => {
     }
 }
 
+const returnClient_id = async (req = request, res = response) => {
+    return res.status(200).json({ googleClientId: process.env.GOOGLE_ID })
+}
+
 module.exports = {
     login,
     googleSingIn,
-    renewToken
+    renewToken,
+    returnClient_id
 }
