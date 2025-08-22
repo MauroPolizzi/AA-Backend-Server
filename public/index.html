@@ -40,12 +40,12 @@
           .catch( console.log );
         }
 
-        // Implementamos el boton con el GOOGLE_ID (variable de entorno .env) en plano
+        // Implementamos el boton con el GOOGLE_ID (variable de entorno .env), obtenida desde function return_client_id
         // Mirar la documentacion 
         // https://developers.google.com/identity/gsi/web/guides/display-button?hl=es-419
         window.onload = async function () {
           google.accounts.id.initialize({
-            client_id: await return_client_id, //"459567625014-odk90d389jnsurk8s89p1ls833srcc29.apps.googleusercontent.com",
+            client_id: await return_client_id,
             callback: handleCredentialResponse
           });
           await google.accounts.id.renderButton(
