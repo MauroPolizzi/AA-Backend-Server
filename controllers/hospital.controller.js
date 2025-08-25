@@ -66,6 +66,17 @@ const postHospital = async (req, res = response) => {
         // al mandarlo por params
         const hospitalDestino = new HospitalModel( {ususarioCreador: req.guid, ...req.body} );
 
+        const { nombre } = req.body;
+
+        // Validamos que no exista un hospital con el mismo nombre
+        const existe = await HospitalModel.findOne({nombre});
+        if(existe) {
+            return res.status(400).json({
+                ok: false,
+                message: 'El nombre que desea proporcinar, ya esta siendo ocupado por otro hospital'
+            });
+        }
+
         await hospitalDestino.save();
 
         res.status(200).json({
@@ -102,16 +113,17 @@ const putHospital = async (req, res = response) => {
 
         const { nombre, ...campos} = req.body;
 
-        if(hospitalDB.nombre !== nombre){
+
+        if(hospitalDB.nombre.toLowerCase() !== nombre){
             const nombreExiste = await HospitalModel.findOne({ nombre });
             if (nombreExiste) {
                 return res.status(400).json({
                     ok: false,
-                    message: 'El Nombre que desea proporcinar, ya esta siendo ocupado por otro Hospital'
+                    message: 'El nombre que desea proporcinar, ya esta siendo ocupado por otro hospital'
                 }); 
             }
 
-            campos.nombre = nombre;
+            campos.nombre = nombre.toLowerCase();
 
             const hospitalDestino = await HospitalModel.findByIdAndUpdate(_guid, campos, { new: true });
 

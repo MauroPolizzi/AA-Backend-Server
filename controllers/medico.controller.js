@@ -60,6 +60,17 @@ const postMedico = async (req, res = response) => {
         // Creamos el medico
         const medicoDestino = new MedicoModel( { usuarioId: req.guid, ...req.body } );
 
+        const { nombre, especialidad } = req.body;
+
+        // Validamos que no exista un medico con el mismo nombre y especialidad
+        const existe = await MedicoModel.findOne({nombre, especialidad})
+        if(existe) {
+            return res.status(400).json({
+                ok: false,
+                message: 'El nombre y/o especialidad que desea proporcinar, ya esta siendo ocupado por otro medico'
+            });
+        }
+
         await medicoDestino.save();
 
         res.status(200).json({
@@ -94,19 +105,20 @@ const putMedico = async (req, res = response) => {
             });
         }
 
-        const { nombre, ...campos } = req.body;
+        const { nombre, especialidad, ...campos } = req.body;
 
-        if (medicoDB.nombre !== nombre) {
-            const nombreExiste = await MedicoModel.findOne({ nombre });
+        if (medicoDB.nombre.toLowerCase() !== nombre) {
+            const nombreExiste = await MedicoModel.findOne({ nombre, especialidad });
             if (nombreExiste) {
                 return res.status(400).json({
                     ok: false,
-                    message: 'El Nombre que desea proporcinar, ya esta siendo ocupado por otro Medico'
+                    message: 'El nombre y/o especialidad que desea proporcinar, ya esta siendo ocupado por otro medico'
                 });
             }
         }
 
-        campos.nombre = nombre;
+        campos.nombre = nombre.toLowerCase();
+        campos.especialidad = especialidad.toLowerCase();
 
         const medicoDestino = await MedicoModel.findByIdAndUpdate(_guid, campos, { new: true });
 
