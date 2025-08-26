@@ -1,7 +1,12 @@
-const { response } = require("express");
-const UsusarioModel = require("../models/ususario.model");
-const MedicoModel = require("../models/medico.model");
+const { response, request } = require("express");
+
 const HospitalModel = require("../models/hospital.model");
+const MedicoModel = require("../models/medico.model");
+const UsusarioModel = require("../models/ususario.model");
+
+const HospitalSearch = require("../strategies/search/hospital.search");
+const MedicoSearch = require("../strategies/search/medico.search");
+const UsuarioSearch = require("../strategies/search/usuario.search");
 
 const getAll = async (req, res= response) => {
 
@@ -28,35 +33,34 @@ const getAll = async (req, res= response) => {
     });
 }
 
-const getAllByCollection = async (req, res = response) => {
+const strategies = {
+    hospital: new HospitalSearch(),
+    medico: new MedicoSearch(),
+    usuario: new UsuarioSearch()
+}
+
+const getAllByCollection = async (req = request, res = response) => {
     
-    const tabla = req.params.tabla;
-    const search = req.params.search;
+    const {tabla, search} = req.params;
     const regExp = new RegExp(search ,'i');
 
-    let data = [];
-    
-    switch (tabla) {
-        case 'hospital':
-            data = await HospitalModel.find({ nombre: regExp }).populate('ususarioCreador', 'nombre');
-            break;
-        case 'medico':
-            data = await MedicoModel.find({ nombre: regExp }).populate('hospitalId', 'nombre');
-            break;
-        case 'usuario':
-            data = await UsusarioModel.find({ nombre: regExp });
-            break;
-        default:
-            return res.status(400).json({
-                ok: false,
-                message: 'Tabla no encontrada'
-            });
+    // Obtenemos la entidad a buscar que se representa con el nombre ed tabla
+    const strategie = strategies[tabla];
+
+    if(!strategie) {
+        return res.status(400).json({
+            ok: false,
+            message: 'Tabla no encontrada'
+        });
     }
 
-    res.status(200).json({
-        ok: true,
-        data
-    });
+    try {
+        // Ejecutamos el metodo de busqueda segun la estrategia
+        const data = await strategie.search(regExp);
+        res.status(200).json({ ok: true, data });
+    } catch (error) {
+        res.status(500).json({ ok: false, message: 'Error en la búsqueda. ' + err.message });
+    }
 }
 
 module.exports = {
