@@ -27,7 +27,7 @@ const validarJWT = (req, res = response, next) => {
 
     } catch (error) {
         
-        console.log(error);
+        console.log('Error en [validator-token.js]: ', error);
         res.status(500).json({
             ok: false,
             message: 'La key proporcionada no es valida'
