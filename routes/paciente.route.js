@@ -1,10 +1,13 @@
 const { Router } = require('express');
-const { getPacientes, postPaciente } = require('../controllers/paciente.controller');
+const { getPacientes, postPaciente, getPacienteById } = require('../controllers/paciente.controller');
 
 const pacienteRouter = Router();
 
 // Get 
 pacienteRouter.get( '/', getPacientes );
+
+// Get By Id
+pacienteRouter.get('/:guid', getPacienteById );
 
 // Post
 pacienteRouter.post( '/', postPaciente );
