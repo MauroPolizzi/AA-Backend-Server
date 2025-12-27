@@ -7,7 +7,8 @@ const getPacientes = async (req = request, resp = response) => {
 
     const [pacienteCollection, total] = await Promise.all([
         
-        PacienteModel.find( {}, 'Guid nombre apellido email')
+        PacienteModel.find( {}, 
+            'Guid nombre apellido tipoDocumento numeroDocumento fechaNacimiento genero tipoSangre telefono email direccion ciudad estado codigoPostal contactoEmergencia numeroSeguro alergias observaciones usuarioId activo img')
             .skip(pagina)
             .limit(10),
 
@@ -17,8 +18,38 @@ const getPacientes = async (req = request, resp = response) => {
     resp.json({
         ok: true,
         pacienteCollection,
-        total
+        total,
+        pagina
     });
+}
+
+const getPacienteById = async (req = request, resp = response) => {
+
+    const _guid = req.params.guid;
+
+    try {
+        const pacienteDB = await PacienteModel.findById(_guid);
+        
+        if (!pacienteDB) {
+            return resp.status(404).json({
+                ok: false,
+                message: 'Paciente no encontrado'
+            });
+        }
+
+        resp.status(200).json({
+            ok: true,
+            paciente: pacienteDB
+        });
+
+    } catch (error) {
+        
+        console.log(error);
+        resp.status(500).json({
+            ok: false,
+            message: 'Error al intentar encontrar paciente'
+        });
+    }
 }
 
 const postPaciente = async (req = request, resp = response) => {
@@ -47,5 +78,6 @@ const postPaciente = async (req = request, resp = response) => {
 
 module.exports = {
     getPacientes,
+    getPacienteById,
     postPaciente
 }
