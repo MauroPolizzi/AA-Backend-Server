@@ -14,6 +14,7 @@ const { hospitalRouter } = require('./routes/hospital.route');
 const { medicoRouter } = require('./routes/medico.route');
 const { searchRouter } = require('./routes/search.route');
 const { fileuploadRouter } = require('./routes/file-upload.route');
+const { pacienteRouter } = require('./routes/paciente.route');
 
 // Creamos el servidor de express
 const app = express();
@@ -38,6 +39,7 @@ app.use('/api/hospital', hospitalRouter);
 app.use('/api/medico', medicoRouter);
 app.use('/api/todo', searchRouter);
 app.use('/api/fileupload', fileuploadRouter);
+app.use('/api/paciente', pacienteRouter);
 
 //Iniciamos el servidor y determinamos el puerto
 app.listen( process.env.PORT, () => {
