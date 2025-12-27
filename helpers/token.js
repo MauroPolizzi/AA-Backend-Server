@@ -16,7 +16,7 @@ const generateJWT = ( guid ) => {
         // Segundo, la firma que tendran los tokens
         // Tercero, el tiempo activo que tendra, antes que exprire
         jwt.sign(payload, process.env.JWT_SECRET_KEY, {
-            expiresIn: '12h'
+            expiresIn: '5m'
         }, (err, token) => {
             
             if(err){
