@@ -55,8 +55,31 @@ const getPacienteById = async (req = request, resp = response) => {
 const postPaciente = async (req = request, resp = response) => {
 
     try {
+
+        const { numeroDocumento, email } = req.body;
+
+        // Verificar ambos campos que deben ser unicos por paciente en paralelo
+        const [pacienteNumeroDocumento, pacienteEmail] = await Promise.all([
+            PacienteModel.findOne({numeroDocumento}),
+            PacienteModel.findOne({email})
+        ]);
+
+        if(pacienteNumeroDocumento) {
+            return resp.status(400).json({
+                ok: false,
+                message: 'El numero de documento ya esta registrado en otro paciente'
+            });
+        }
+
+        if(pacienteEmail) {
+            return resp.status(400).json({
+                ok: false,
+                message: 'El email ya esta registrado en otro paciente'
+            });
+        }
+
         const pacienteDestino = new PacienteModel( req.body );
-        
+
         await pacienteDestino.save();
 
         resp.status(201).json({
