@@ -1,5 +1,6 @@
 const { request, response } = require('express');
 const PacienteModel = require('../models/paciente.model');
+const UsusarioModel = require('../models/ususario.model');
 
 const getPacientes = async (req = request, resp = response) => {
 
@@ -56,12 +57,14 @@ const postPaciente = async (req = request, resp = response) => {
 
     try {
 
-        const { numeroDocumento, email } = req.body;
+        const { numeroDocumento, email, usuarioId } = req.body;
 
         // Verificar ambos campos que deben ser unicos por paciente en paralelo
-        const [pacienteNumeroDocumento, pacienteEmail] = await Promise.all([
+        // Tambien que exista el usuario
+        const [pacienteNumeroDocumento, pacienteEmail, usuarioExistente] = await Promise.all([
             PacienteModel.findOne({numeroDocumento}),
-            PacienteModel.findOne({email})
+            PacienteModel.findOne({email}),
+            UsusarioModel.findById(usuarioId)
         ]);
 
         if(pacienteNumeroDocumento) {
@@ -75,6 +78,13 @@ const postPaciente = async (req = request, resp = response) => {
             return resp.status(400).json({
                 ok: false,
                 message: 'El email ya esta registrado en otro paciente'
+            });
+        }
+
+        if(!usuarioExistente) {
+            return resp.status(404).json({
+                ok: false,
+                message: 'El usuario no existe en la base de datos'
             });
         }
 
