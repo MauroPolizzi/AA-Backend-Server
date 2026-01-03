@@ -109,8 +109,58 @@ const postPaciente = async (req = request, resp = response) => {
 
 }
 
+const putPaciente = async (req = request, resp = response) => {
+
+    const _guid = req.params.guid;
+
+    try {
+
+        const pacienteDB = await PacienteModel.findById(_guid);
+
+        if(!pacienteDB){
+            return resp.status(404).json({
+                ok: false,
+                message: 'Paciente no encontrado'
+            });
+        }
+
+        // Obtenemos los campos unicos que no se pueden repetir y validamos
+        const { numeroDocumento, email, ...campos } = req.body;
+
+        if(pacienteDB.numeroDocumento !== numeroDocumento) {
+            const numeroDocumentoExiste = await PacienteModel.findOne({numeroDocumento});
+            if(numeroDocumento) {
+                return resp.status(400).json({
+                    ok: false,
+                    message: 'El numero de documento ya esta siendo ocupado por otro paciente'
+                });
+            }
+        }
+
+        campos.numeroDocumento = numeroDocumento;
+        campos.email = email;
+        
+        const pacienteDestino = await PacienteModel.findByIdAndUpdate(_guid, campos, { new: true });
+
+        return resp.status(200).json({
+            ok: true,
+            message: 'Paciente actualizado',
+            pacienteDestino
+        });
+
+    } catch (error) {
+        
+        console.log(error);
+        resp.status(500).json({
+            ok: false,
+            message: 'Error al intentar actualizar al paciente'
+        });
+    }
+}
+
 module.exports = {
     getPacientes,
     getPacienteById,
-    postPaciente
+    postPaciente,
+    putPaciente
 }
