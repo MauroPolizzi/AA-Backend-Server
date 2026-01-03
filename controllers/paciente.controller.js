@@ -124,22 +124,69 @@ const putPaciente = async (req = request, resp = response) => {
             });
         }
 
-        // Obtenemos los campos unicos que no se pueden repetir y validamos
-        const { numeroDocumento, email, ...campos } = req.body;
+        // Extraemos los campos únicos y el usuarioId para validarlos
+        const { numeroDocumento, email, usuarioId, ...campos } = req.body;
 
+        // Preparar validaciones en paralelo
+        const validaciones = [];
+
+        // Solo validar numeroDocumento si cambió
         if(pacienteDB.numeroDocumento !== numeroDocumento) {
-            const numeroDocumentoExiste = await PacienteModel.findOne({numeroDocumento});
-            if(numeroDocumento) {
-                return resp.status(400).json({
-                    ok: false,
-                    message: 'El numero de documento ya esta siendo ocupado por otro paciente'
-                });
-            }
+            validaciones.push(
+                PacienteModel.findOne({ numeroDocumento, _id: { $ne: _guid } })
+            );
+        } else {
+            validaciones.push(Promise.resolve(null));
         }
 
+        // Solo validar email si cambió
+        if(pacienteDB.email !== email) {
+            validaciones.push(
+                // Excluimos el paciente actual de la busqueda
+                PacienteModel.findOne({ email, _id: { $ne: _guid } })
+            );
+        } else {
+            validaciones.push(Promise.resolve(null));
+        }
+
+        // Validar que el usuario exista si cambió
+        if(pacienteDB.usuarioId.toString() !== usuarioId) {
+            validaciones.push(
+                UsusarioModel.findById(usuarioId)
+            );
+        } else {
+            validaciones.push(Promise.resolve(true)); // Usuario ya validado
+        }
+
+        // Ejecutar todas las validaciones en paralelo
+        const [numeroDocumentoExiste, emailExiste, usuarioExistente] = await Promise.all(validaciones);
+
+        if(numeroDocumentoExiste) {
+            return resp.status(400).json({
+                ok: false,
+                message: 'El numero de documento ya esta siendo ocupado por otro paciente'
+            });
+        }
+
+        if(emailExiste) {
+            return resp.status(400).json({
+                ok: false,
+                message: 'El email ya esta siendo ocupado por otro paciente'
+            });
+        }
+
+        if(!usuarioExistente) {
+            return resp.status(404).json({
+                ok: false,
+                message: 'El usuario no existe en la base de datos'
+            });
+        }
+
+        // Agregar los campos validados
         campos.numeroDocumento = numeroDocumento;
-        campos.email = email;
-        
+        campos.email = email;   
+        campos.usuarioId = usuarioId;
+
         const pacienteDestino = await PacienteModel.findByIdAndUpdate(_guid, campos, { new: true });
 
         return resp.status(200).json({
@@ -149,7 +196,7 @@ const putPaciente = async (req = request, resp = response) => {
         });
 
     } catch (error) {
-        
+
         console.log(error);
         resp.status(500).json({
             ok: false,
