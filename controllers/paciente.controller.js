@@ -7,13 +7,13 @@ const getPacientes = async (req = request, resp = response) => {
     const pagina = Number(req.query.pagina) || 0;
 
     const [pacienteCollection, total] = await Promise.all([
-        
-        PacienteModel.find( {}, 
+
+        PacienteModel.find( { activo: true },
             'Guid nombre apellido tipoDocumento numeroDocumento fechaNacimiento genero tipoSangre telefono email direccion ciudad estado codigoPostal contactoEmergencia numeroSeguro alergias observaciones usuarioId activo img')
             .skip(pagina)
             .limit(10),
 
-        PacienteModel.count()
+        PacienteModel.countDocuments({ activo: true })
     ]);
 
     resp.json({
@@ -205,9 +205,59 @@ const putPaciente = async (req = request, resp = response) => {
     }
 }
 
+const deletePaciente = async (req = request, resp = response) => {
+
+    const _guid = req.params.guid;
+
+    try {
+
+        // Borrado lógico - marcar como inactivo
+        const paciente = await PacienteModel.findByIdAndUpdate(
+            _guid,
+            { activo: false },
+            { new: true }
+        );
+
+        if(!paciente) {
+            return resp.status(404).json({
+                ok: false,
+                message: 'Paciente no encontrado'
+            });
+        }
+
+        return resp.status(200).json({
+            ok: true,
+            message: 'Paciente eliminado correctamente',
+            paciente: {
+                _id: paciente._id,
+                nombre: paciente.nombre,
+                apellido: paciente.apellido,
+                activo: paciente.activo
+            }
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        if(error.name === 'CastError') {
+            return resp.status(400).json({
+                ok: false,
+                message: 'ID de paciente inválido'
+            });
+        }
+
+        resp.status(500).json({
+            ok: false,
+            message: 'Error al intentar eliminar paciente'
+        });
+    }
+}
+
 module.exports = {
     getPacientes,
     getPacienteById,
     postPaciente,
-    putPaciente
+    putPaciente,
+    deletePaciente
 }
