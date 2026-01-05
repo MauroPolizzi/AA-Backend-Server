@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 const { Genero, TipoSangre, TipoDocumento } = require('../models/enums');
-const { getPacientes, postPaciente, putPaciente, getPacienteById } = require('../controllers/paciente.controller');
+const { getPacientes, postPaciente, putPaciente, getPacienteById, deletePaciente } = require('../controllers/paciente.controller');
 const { validarCampos } = require('../middlewares/validator-campos');
 
 const pacienteRouter = Router();
@@ -58,7 +58,10 @@ pacienteRouter.put('/:guid',
         check('usuarioId', 'El ID de usuario debe ser un ObjectId válido').isMongoId(),
         validarCampos
     ], 
-    putPaciente)
+    putPaciente);
+
+// Delete
+pacienteRouter.delete('/:guid', deletePaciente);
 
 module.exports = {
     pacienteRouter
