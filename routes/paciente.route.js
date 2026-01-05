@@ -3,18 +3,20 @@ const { check } = require('express-validator');
 const { Genero, TipoSangre, TipoDocumento } = require('../models/enums');
 const { getPacientes, postPaciente, putPaciente, getPacienteById, deletePaciente } = require('../controllers/paciente.controller');
 const { validarCampos } = require('../middlewares/validator-campos');
+const { validarJWT } = require('../middlewares/validator-token');
 
 const pacienteRouter = Router();
 
 // Get
-pacienteRouter.get( '/', getPacientes );
+pacienteRouter.get( '/', [validarJWT], getPacientes );
 
 // Get By Id
-pacienteRouter.get('/:guid', getPacienteById );
+pacienteRouter.get('/:guid', [validarJWT], getPacienteById );
 
 // Post
-pacienteRouter.post( '/', 
+pacienteRouter.post( '/',
     [
+        validarJWT,
         check('nombre', 'El nombre es obligatorio').not().isEmpty(),
         check('apellido', 'El apellido es obligatorio').not().isEmpty(),
         check('tipoDocumento', 'El tipo de documento es obligatorio').not().isEmpty(),
@@ -37,8 +39,9 @@ pacienteRouter.post( '/',
     postPaciente );
 
 // Put
-pacienteRouter.put('/:guid', 
+pacienteRouter.put('/:guid',
     [
+        validarJWT,
         check('nombre', 'El nombre es obligatorio').not().isEmpty(),
         check('apellido', 'El apellido es obligatorio').not().isEmpty(),
         check('tipoDocumento', 'El tipo de documento es obligatorio').not().isEmpty(),
@@ -61,7 +64,7 @@ pacienteRouter.put('/:guid',
     putPaciente);
 
 // Delete
-pacienteRouter.delete('/:guid', deletePaciente);
+pacienteRouter.delete('/:guid', [validarJWT], deletePaciente);
 
 module.exports = {
     pacienteRouter
