@@ -79,6 +79,7 @@ describe('Paciente Route - Validation and Security Tests', () => {
             ];
 
             const mockFind = {
+                populate: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 limit: jest.fn().mockResolvedValue(mockPacientes)
             };
