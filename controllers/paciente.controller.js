@@ -4,24 +4,35 @@ const UsusarioModel = require('../models/ususario.model');
 
 const getPacientes = async (req = request, resp = response) => {
 
-    const pagina = Number(req.query.pagina) || 0;
+    try {
+        
+        const pagina = Number(req.query.pagina) || 0;
+    
+        const [pacienteCollection, total] = await Promise.all([
+    
+            PacienteModel.find( { activo: true },
+                'Guid nombre apellido tipoDocumento numeroDocumento fechaNacimiento genero tipoSangre telefono email direccion ciudad estado codigoPostal contactoEmergencia numeroSeguro alergias observaciones activo img')
+                .populate('usuarioId', 'nombre email role')
+                .skip(pagina)
+                .limit(10),
+    
+            PacienteModel.countDocuments({ activo: true })
+        ]);
+    
+        return resp.json({
+            ok: true,
+            pacienteCollection,
+            total,
+            pagina
+        });
 
-    const [pacienteCollection, total] = await Promise.all([
-
-        PacienteModel.find( { activo: true },
-            'Guid nombre apellido tipoDocumento numeroDocumento fechaNacimiento genero tipoSangre telefono email direccion ciudad estado codigoPostal contactoEmergencia numeroSeguro alergias observaciones usuarioId activo img')
-            .skip(pagina)
-            .limit(10),
-
-        PacienteModel.countDocuments({ activo: true })
-    ]);
-
-    resp.json({
-        ok: true,
-        pacienteCollection,
-        total,
-        pagina
-    });
+    } catch (error) {
+        console.log(error);
+        return resp.status(500).json({
+            ok: false,
+            message: 'Error al intentar obtener la lista de pacientes'
+        });
+    }
 }
 
 const getPacienteById = async (req = request, resp = response) => {
