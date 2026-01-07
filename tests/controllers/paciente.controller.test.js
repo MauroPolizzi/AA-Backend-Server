@@ -109,7 +109,12 @@ describe('Paciente Controller', () => {
     describe('getPacienteById', () => {
         it('retorna 404 si el paciente no existe', async () => {
             req.params.guid = 'nonexistent-id';
-            PacienteModel.findById.mockResolvedValue(null);
+
+            const mockPopulate = {
+                populate: jest.fn().mockResolvedValue(null)
+            };
+
+            PacienteModel.findById.mockReturnValue(mockPopulate);
 
             await getPacienteById(req, res);
 
@@ -128,11 +133,17 @@ describe('Paciente Controller', () => {
                 activo: true
             };
             req.params.guid = 'valid-id';
-            PacienteModel.findById.mockResolvedValue(mockPaciente);
+
+            const mockPopulate = {
+                populate: jest.fn().mockResolvedValue(mockPaciente)
+            };
+
+            PacienteModel.findById.mockReturnValue(mockPopulate);
 
             await getPacienteById(req, res);
 
             expect(PacienteModel.findById).toHaveBeenCalledWith('valid-id');
+            expect(mockPopulate.populate).toHaveBeenCalledWith('usuarioId', 'nombre email role');
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith({
                 ok: true,
@@ -142,7 +153,12 @@ describe('Paciente Controller', () => {
 
         it('maneja errores y retorna 500', async () => {
             req.params.guid = 'error-id';
-            PacienteModel.findById.mockRejectedValue(new Error('DB error'));
+
+            const mockPopulate = {
+                populate: jest.fn().mockRejectedValue(new Error('DB error'))
+            };
+
+            PacienteModel.findById.mockReturnValue(mockPopulate);
             jest.spyOn(console, 'log').mockImplementation();
 
             await getPacienteById(req, res);
