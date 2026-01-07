@@ -81,6 +81,16 @@ const PacienteModel = Schema({
     }
 }, { collection: 'pacientes' }); // nombre de la tabla/collection en BBDD mongo
 
+// Índices para optimización de consultas
+// numeroDocumento ya tiene índice único por la propiedad unique: true
+PacienteModel.index({ nombre: 1 }); // Índice ascendente para búsquedas por nombre
+PacienteModel.index({ apellido: 1 }); // Índice ascendente para búsquedas por apellido
+PacienteModel.index({ activo: 1 }); // Índice para filtrar pacientes activos/inactivos
+PacienteModel.index({ usuarioId: 1 }); // Índice para búsquedas por usuario asociado
+
+// Índice compuesto para búsquedas combinadas (nombre + apellido + activo)
+PacienteModel.index({ nombre: 1, apellido: 1, activo: 1 });
+
 PacienteModel.methods.getAge = function () {
   const today = new Date();
   const birthDate = new Date(this.fechaNacimiento);
