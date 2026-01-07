@@ -12,6 +12,7 @@ const getPacientes = async (req = request, resp = response) => {
     
             PacienteModel.find( { activo: true },
                 'Guid nombre apellido tipoDocumento numeroDocumento fechaNacimiento genero tipoSangre telefono email direccion ciudad estado codigoPostal contactoEmergencia numeroSeguro alergias observaciones activo img')
+                .select('nombre apellido numeroDocumento fechaNacimiento telefono email img')
                 .populate('usuarioId', 'nombre email role')
                 .skip(pagina)
                 .limit(10),
