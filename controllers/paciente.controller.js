@@ -41,7 +41,8 @@ const getPacienteById = async (req = request, resp = response) => {
     const _guid = req.params.guid;
 
     try {
-        const pacienteDB = await PacienteModel.findById(_guid);
+        const pacienteDB = await PacienteModel.findById(_guid)
+            .populate('usuarioId', 'nombre email role');
         
         if (!pacienteDB) {
             return resp.status(404).json({
