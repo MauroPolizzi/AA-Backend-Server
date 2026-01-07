@@ -30,6 +30,7 @@ describe('Paciente Controller', () => {
             const mockTotal = 15;
 
             const mockFind = {
+                select: jest.fn().mockReturnThis(),
                 populate: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 limit: jest.fn().mockResolvedValue(mockPacientes)
@@ -44,6 +45,7 @@ describe('Paciente Controller', () => {
                 { activo: true },
                 expect.any(String)
             );
+            expect(mockFind.select).toHaveBeenCalledWith('nombre apellido numeroDocumento fechaNacimiento telefono email img');
             expect(mockFind.populate).toHaveBeenCalledWith('usuarioId', 'nombre email role');
             expect(mockFind.skip).toHaveBeenCalledWith(0);
             expect(mockFind.limit).toHaveBeenCalledWith(10);
@@ -61,6 +63,7 @@ describe('Paciente Controller', () => {
             const mockTotal = 25;
 
             const mockFind = {
+                select: jest.fn().mockReturnThis(),
                 populate: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 limit: jest.fn().mockResolvedValue(mockPacientes)
@@ -71,6 +74,7 @@ describe('Paciente Controller', () => {
 
             await getPacientes(req, res);
 
+            expect(mockFind.select).toHaveBeenCalledWith('nombre apellido numeroDocumento fechaNacimiento telefono email img');
             expect(mockFind.populate).toHaveBeenCalledWith('usuarioId', 'nombre email role');
             expect(mockFind.skip).toHaveBeenCalledWith(2);
             expect(res.json).toHaveBeenCalledWith({
@@ -85,6 +89,7 @@ describe('Paciente Controller', () => {
             req.query.pagina = 'invalid';
             const mockPacientes = [];
             const mockFind = {
+                select: jest.fn().mockReturnThis(),
                 populate: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 limit: jest.fn().mockResolvedValue(mockPacientes)
@@ -95,6 +100,7 @@ describe('Paciente Controller', () => {
 
             await getPacientes(req, res);
 
+            expect(mockFind.select).toHaveBeenCalledWith('nombre apellido numeroDocumento fechaNacimiento telefono email img');
             expect(mockFind.populate).toHaveBeenCalledWith('usuarioId', 'nombre email role');
             expect(mockFind.skip).toHaveBeenCalledWith(0);
         });
