@@ -79,6 +79,7 @@ describe('Paciente Route - Validation and Security Tests', () => {
             ];
 
             const mockFind = {
+                select: jest.fn().mockReturnThis(),
                 populate: jest.fn().mockReturnThis(),
                 skip: jest.fn().mockReturnThis(),
                 limit: jest.fn().mockResolvedValue(mockPacientes)
@@ -109,10 +110,16 @@ describe('Paciente Route - Validation and Security Tests', () => {
             const mockPaciente = {
                 _id: '507f1f77bcf86cd799439011',
                 nombre: 'Juan',
-                apellido: 'Pérez'
+                apellido: 'Pérez',
+                fechaNacimiento: new Date('1990-01-01'),
+                edad: 35
             };
 
-            PacienteModel.findById.mockResolvedValue(mockPaciente);
+            const mockFindById = {
+                populate: jest.fn().mockResolvedValue(mockPaciente)
+            };
+
+            PacienteModel.findById.mockReturnValue(mockFindById);
 
             const response = await request(app)
                 .get('/api/pacientes/507f1f77bcf86cd799439011')

@@ -101,7 +101,7 @@ describe('Paciente Model', () => {
         });
     });
 
-    describe('getAge Method', () => {
+    describe('edad Virtual Property', () => {
         let paciente;
         let OriginalDate;
 
@@ -139,7 +139,7 @@ describe('Paciente Model', () => {
             };
 
             paciente.fechaNacimiento = new OriginalDate('1990-06-15');
-            const edad = paciente.getAge();
+            const edad = paciente.edad;
 
             expect(edad).toBe(35);
         });
@@ -158,7 +158,7 @@ describe('Paciente Model', () => {
             };
 
             paciente.fechaNacimiento = new OriginalDate('1990-06-15');
-            const edad = paciente.getAge();
+            const edad = paciente.edad;
 
             expect(edad).toBe(34);
         });
@@ -177,7 +177,7 @@ describe('Paciente Model', () => {
             };
 
             paciente.fechaNacimiento = new OriginalDate('1990-06-15');
-            const edad = paciente.getAge();
+            const edad = paciente.edad;
 
             expect(edad).toBe(34);
         });
@@ -196,7 +196,7 @@ describe('Paciente Model', () => {
             };
 
             paciente.fechaNacimiento = new OriginalDate('1990-06-15');
-            const edad = paciente.getAge();
+            const edad = paciente.edad;
 
             expect(edad).toBe(35);
         });
@@ -215,7 +215,7 @@ describe('Paciente Model', () => {
             };
 
             paciente.fechaNacimiento = new OriginalDate('1990-06-15');
-            const edad = paciente.getAge();
+            const edad = paciente.edad;
 
             expect(edad).toBe(35);
         });
@@ -234,14 +234,14 @@ describe('Paciente Model', () => {
             };
 
             paciente.fechaNacimiento = new OriginalDate('2025-03-10');
-            const edad = paciente.getAge();
+            const edad = paciente.edad;
 
             expect(edad).toBe(0);
         });
     });
 
     describe('toJSON Method', () => {
-        it('debe transformar _id a Guid y remover __v', () => {
+        it('debe transformar _id a Guid y remover __v e id', () => {
             const paciente = new PacienteModel({
                 nombre: 'María',
                 apellido: 'González',
@@ -258,10 +258,31 @@ describe('Paciente Model', () => {
             const json = paciente.toJSON();
 
             expect(json._id).toBeUndefined();
+            expect(json.id).toBeUndefined();
             expect(json.__v).toBeUndefined();
             expect(json.Guid).toBeDefined();
             expect(json.nombre).toBe('María');
             expect(json.apellido).toBe('González');
+        });
+
+        it('debe incluir la propiedad virtual edad en el JSON', () => {
+            const paciente = new PacienteModel({
+                nombre: 'María',
+                apellido: 'González',
+                tipoDocumento: TipoDocumento.DNI,
+                numeroDocumento: 87654321,
+                fechaNacimiento: new Date('1990-01-01'),
+                genero: TipoSangre.O_POS,
+                tipoSangre: Genero.FEMENINO,
+                email: 'maria.gonzalez@test.com',
+                direccion: 'Avenida 456',
+                usuarioId: new mongoose.Types.ObjectId()
+            });
+
+            const json = paciente.toJSON();
+
+            expect(json.edad).toBeDefined();
+            expect(typeof json.edad).toBe('number');
         });
 
         it('debe mantener todos los demás campos en el JSON', () => {
