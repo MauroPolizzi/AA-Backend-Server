@@ -27,16 +27,18 @@ const UsuarioModel = Schema({
         type: Boolean,
         default: false
     }
+}, {
+    toJSON: {
+        virtuals: true,
+        versionKey: false,
+        transform: function(doc, ret) {
+            delete ret._id;
+            delete ret.id;
+            delete ret.password;
+            ret.Guid = doc._id;
+            return ret;
+        }
+    }
 })
-
-// Configuracion global del modelo de Usuario
-// Sacamos los valores de __v y _id de la respuesta que devolvemos
-// Creamos el campo Guid y le damos el valor de _id
-// Esto es a modo visual y no afecta la BBDD
-UsuarioModel.method('toJSON', function() {
-    const {__v, _id, password, ...object} = this.toObject();
-    object.Guid = _id;
-    return object;
-});
 
 module.exports = model( 'usuario', UsuarioModel );

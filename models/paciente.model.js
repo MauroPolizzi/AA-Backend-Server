@@ -2,7 +2,7 @@ const { Schema, model } = require("mongoose");
 const { Genero, TipoSangre, TipoDocumento } = require("./enums");
 
 const PacienteModel = Schema({
-    
+
     nombre: {
         type: String,
         required: true
@@ -64,7 +64,7 @@ const PacienteModel = Schema({
     },
     alergias: {
         type: String
-    }, 
+    },
     observaciones: {
         type: String
     },
@@ -79,7 +79,19 @@ const PacienteModel = Schema({
     img: {
         type: String
     }
-}, { collection: 'pacientes' }); // nombre de la tabla/collection en BBDD mongo
+}, {
+    collection: 'pacientes',
+    toJSON: {
+        virtuals: true,
+        versionKey: false,
+        transform: function(doc, ret) {
+            delete ret._id;
+            delete ret.id;
+            ret.Guid = doc._id;
+            return ret;
+        }
+    }
+}); // nombre de la tabla/collection en BBDD mongo
 
 // Índices para optimización de consultas
 // numeroDocumento ya tiene índice único por la propiedad unique: true
@@ -91,7 +103,8 @@ PacienteModel.index({ usuarioId: 1 }); // Índice para búsquedas por usuario as
 // Índice compuesto para búsquedas combinadas (nombre + apellido + activo)
 PacienteModel.index({ nombre: 1, apellido: 1, activo: 1 });
 
-PacienteModel.methods.getAge = function () {
+// Virtual property para la edad
+PacienteModel.virtual('edad').get(function () {
   const today = new Date();
   const birthDate = new Date(this.fechaNacimiento);
 
@@ -106,16 +119,6 @@ PacienteModel.methods.getAge = function () {
   }
 
   return age;
-};
-
-// Configuracion global del modelo de Paciente
-// Sacamos los valores de __v y _id de la respuesta que devolvemos
-// Creamos el campo Guid y le damos el valor de _id
-// Esto es a modo visual y no afecta la BBDD
-PacienteModel.method('toJSON', function() {
-    const {__v, _id, ...object} = this.toObject();
-    object.Guid = _id;
-    return object;
 });
 
 module.exports = model( 'paciente', PacienteModel );
