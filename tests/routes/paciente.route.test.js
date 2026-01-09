@@ -4,6 +4,7 @@ const { pacienteRouter } = require('../../routes/paciente.route');
 const PacienteModel = require('../../models/paciente.model');
 const UsusarioModel = require('../../models/ususario.model');
 const { Genero, TipoSangre, TipoDocumento } = require('../../models/enums');
+const { populate } = require('dotenv');
 
 // Mocks
 jest.mock('../../models/paciente.model');
@@ -439,10 +440,14 @@ describe('Paciente Route - Validation and Security Tests', () => {
                 _id: '507f1f77bcf86cd799439011'
             };
 
+            const mockFindByIdAndUpdate = {
+                populate: jest.fn().mockResolvedValue(mockUpdatedPaciente)
+            };
+
             PacienteModel.findById.mockResolvedValue(mockPacienteDB);
             PacienteModel.findOne.mockResolvedValue(null);
             UsusarioModel.findById.mockResolvedValue({ _id: validPacienteData.usuarioId });
-            PacienteModel.findByIdAndUpdate.mockResolvedValue(mockUpdatedPaciente);
+            PacienteModel.findByIdAndUpdate.mockReturnValue(mockFindByIdAndUpdate);
 
             const response = await request(app)
                 .put('/api/pacientes/507f1f77bcf86cd799439011')

@@ -200,7 +200,8 @@ const putPaciente = async (req = request, resp = response) => {
         campos.email = email;   
         campos.usuarioId = usuarioId;
 
-        const pacienteDestino = await PacienteModel.findByIdAndUpdate(_guid, campos, { new: true });
+        const pacienteDestino = await PacienteModel.findByIdAndUpdate(_guid, campos, { new: true })
+            .populate('usuarioId', 'nombre email role');
 
         return resp.status(200).json({
             ok: true,
