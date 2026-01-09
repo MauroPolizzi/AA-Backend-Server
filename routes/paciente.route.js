@@ -4,6 +4,7 @@ const { Genero, TipoSangre, TipoDocumento } = require('../models/enums');
 const { getPacientes, postPaciente, putPaciente, getPacienteById, deletePaciente } = require('../controllers/paciente.controller');
 const { validarCampos } = require('../middlewares/validator-campos');
 const { validarJWT } = require('../middlewares/validator-token');
+const { validarIdMongo } = require('../middlewares/validador-id');
 
 const pacienteRouter = Router();
 
@@ -11,7 +12,7 @@ const pacienteRouter = Router();
 pacienteRouter.get( '/', [validarJWT], getPacientes );
 
 // Get By Id
-pacienteRouter.get('/:guid', [validarJWT], getPacienteById );
+pacienteRouter.get('/:guid', [validarJWT, validarIdMongo], getPacienteById );
 
 // Post
 pacienteRouter.post( '/',
@@ -42,6 +43,7 @@ pacienteRouter.post( '/',
 pacienteRouter.put('/:guid',
     [
         validarJWT,
+        validarIdMongo,
         check('nombre', 'El nombre es obligatorio').not().isEmpty(),
         check('apellido', 'El apellido es obligatorio').not().isEmpty(),
         check('tipoDocumento', 'El tipo de documento es obligatorio').not().isEmpty(),
@@ -64,7 +66,7 @@ pacienteRouter.put('/:guid',
     putPaciente);
 
 // Delete
-pacienteRouter.delete('/:guid', [validarJWT], deletePaciente);
+pacienteRouter.delete('/:guid', [validarJWT, validarIdMongo], deletePaciente);
 
 module.exports = {
     pacienteRouter
